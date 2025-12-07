@@ -81,7 +81,7 @@
   <!-- ADMIN APP VIEW -->
   <div id="appView" class="hidden min-h-screen fade-slide">
     <div class="max-w-7xl mx-auto px-4 py-4 md:py-6 flex gap-4">
-      <!-- Sidebar -->
+      <!-- Sidebar (desktop) -->
       <aside class="hidden md:flex flex-col w-64 glass rounded-3xl p-4 shadow-neon">
         <div class="flex items-center gap-3 mb-6">
           <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">
@@ -116,20 +116,38 @@
 
       <!-- Main content -->
       <main class="flex-1 space-y-4 md:space-y-5">
-        <!-- Top bar (mobile) -->
-        <div class="md:hidden flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2">
-            <div class="h-8 w-8 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold">
-              A
+        <!-- Top bar + MOBILE NAV -->
+        <div class="md:hidden mb-3 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="h-8 w-8 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold">
+                A
+              </div>
+              <div>
+                <p class="text-sm font-semibold">AWT Admin</p>
+                <p class="text-[11px] text-slate-400">Dashboard</p>
+              </div>
             </div>
-            <div>
-              <p class="text-sm font-semibold">AWT Admin</p>
-              <p class="text-[11px] text-slate-400">Dashboard</p>
-            </div>
+            <button id="logoutBtnMobile" class="text-xs text-slate-400 hover:text-slate-100 border border-slate-700 rounded-full px-3 py-1">
+              Logout
+            </button>
           </div>
-          <button id="logoutBtnMobile" class="text-xs text-slate-400 hover:text-slate-100 border border-slate-700 rounded-full px-3 py-1">
-            Logout
-          </button>
+
+          <!-- MOBILE NAV BUTTONS -->
+          <div class="glass rounded-2xl px-2 py-2 flex flex-wrap gap-2 text-[11px]">
+            <button data-view="dashboard" class="nav-btn flex-1 min-w-[40%] px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-700 text-slate-100 text-left">
+              Overview
+            </button>
+            <button data-view="posts" class="nav-btn flex-1 min-w-[40%] px-3 py-1.5 rounded-xl border border-transparent text-slate-300 text-left hover:bg-slate-900/60 hover:border-slate-600">
+              Posts
+            </button>
+            <button data-view="create" class="nav-btn flex-1 min-w-[40%] px-3 py-1.5 rounded-xl border border-transparent text-slate-300 text-left hover:bg-slate-900/60 hover:border-slate-600">
+              New Post
+            </button>
+            <button data-view="notifications" class="nav-btn flex-1 min-w-[40%] px-3 py-1.5 rounded-xl border border-transparent text-slate-300 text-left hover:bg-slate-900/60 hover:border-slate-600">
+              Notifications
+            </button>
+          </div>
         </div>
 
         <!-- DASHBOARD VIEW -->
@@ -156,7 +174,9 @@
         <section id="view-posts" class="hidden glass rounded-3xl p-4 md:p-5 border border-slate-700/70">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-base md:text-lg font-semibold">Posts</h2>
-            <button data-view="create" class="nav-btn text-xs border border-primary-500 px-3 py-1.5 rounded-full hover:bg-primary-600 hover:text-white">+ New Post</button>
+            <button data-view="create" class="nav-btn text-xs border border-primary-500 px-3 py-1.5 rounded-full hover:bg-primary-600 hover:text-white">
+              + New Post
+            </button>
           </div>
           <div class="overflow-x-auto text-xs md:text-sm">
             <table class="w-full border-collapse">
@@ -352,11 +372,8 @@
     function setActiveView(viewName) {
       Object.entries(views).forEach(([name, el]) => {
         if (!el) return;
-        if (name === viewName) {
-          el.classList.remove('hidden');
-        } else {
-          el.classList.add('hidden');
-        }
+        if (name === viewName) el.classList.remove('hidden');
+        else el.classList.add('hidden');
       });
 
       navButtons.forEach(btn => {
