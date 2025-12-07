@@ -101,7 +101,7 @@
                     </span>
                 </div>
                 
-                <!-- Search & Theme -->
+                <!-- Search Only (No Theme Toggle) -->
                 <div class="flex items-center space-x-4">
                     <div class="relative hidden md:block group">
                         <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-blue rounded-full blur opacity-50 group-hover:opacity-100 transition duration-300"></div>
@@ -111,15 +111,6 @@
                             <svg class="w-4 h-4 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
-
-                    <button id="themeToggle" class="p-2 rounded-full glass-panel hover:bg-white/10 transition-colors relative overflow-hidden group">
-                        <span class="relative z-10">
-                            <!-- Sun -->
-                            <svg id="sunIcon" class="w-6 h-6 text-yellow-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                            <!-- Moon -->
-                            <svg id="moonIcon" class="w-6 h-6 text-neon-purple hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 24.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                        </span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -213,40 +204,11 @@
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
+            // Theme toggle logic removed. Always Dark Mode.
             loadPosts();
             initSearch();
             listenForNotifications();
         });
-
-        // --- THEME LOGIC ---
-        function initTheme() {
-            const themeToggle = document.getElementById('themeToggle');
-            const sun = document.getElementById('sunIcon');
-            const moon = document.getElementById('moonIcon');
-            
-            // Check local storage or system pref
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                sun.classList.remove('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                moon.classList.remove('hidden');
-            }
-
-            themeToggle.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.theme = 'dark';
-                    sun.classList.remove('hidden');
-                    moon.classList.add('hidden');
-                } else {
-                    localStorage.theme = 'light';
-                    sun.classList.add('hidden');
-                    moon.classList.remove('hidden');
-                }
-            });
-        }
 
         // --- DATA FETCHING ---
         async function loadPosts() {
