@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>AWT Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          },
+          boxShadow: {
+            neon: '0 0 20px rgba(129, 140, 248, 0.8)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    .glass {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148,163,184,0.35);
+      backdrop-filter: blur(18px);
+    }
+    .fade-slide {
+      animation: fadeSlide 0.4s ease-out forwards;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 antialiased">
+
+  <!-- Background blobs -->
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-28 -left-10 h-64 w-64 rounded-full bg-indigo-600 opacity-30 blur-3xl"></div>
+    <div class="absolute -bottom-32 -right-16 h-72 w-72 rounded-full bg-pink-500 opacity-30 blur-3xl"></div>
+  </div>
+
+  <!-- LOGIN VIEW -->
+  <div id="loginView" class="flex items-center justify-center min-h-screen px-4 fade-slide">
+    <div class="max-w-sm w-full glass rounded-3xl p-6 shadow-neon">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold">
+          A
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold">AWT Admin</h1>
+          <p class="text-xs text-slate-400">Secure access · Internal use</p>
+        </div>
+      </div>
+
+      <label class="block text-xs font-medium text-slate-300 mb-1">Admin Password</label>
+      <input id="passwordInput" type="password" class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="Enter admin password" />
+
+      <button id="loginBtn" class="mt-4 w-full py-2 rounded-xl bg-primary-600 hover:bg-primary-500 transition text-sm font-semibold shadow-neon">
+        Login
+      </button>
+
+      <p id="loginMessage" class="mt-2 text-xs text-rose-400"></p>
+    </div>
+  </div>
+
+  <!-- ADMIN APP VIEW -->
+  <div id="appView" class="hidden min-h-screen fade-slide">
+    <div class="max-w-7xl mx-auto px-4 py-4 md:py-6 flex gap-4">
+      <!-- Sidebar -->
+      <aside class="hidden md:flex flex-col w-64 glass rounded-3xl p-4 shadow-neon">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">
+            A
+          </div>
+          <div>
+            <p class="text-sm font-semibold">AWT Admin</p>
+            <p class="text-[11px] text-slate-400">Dashboard</p>
+          </div>
+        </div>
+
+        <nav class="space-y-1 text-sm">
+          <button data-view="dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-xl bg-slate-900/70 border border-slate-700 text-slate-100 flex items-center justify-between">
+            <span>Overview</span><span class="text-xs text-slate-400">●</span>
+          </button>
+          <button data-view="posts" class="nav-btn w-full text-left px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900/60 hover:border-slate-600 border border-transparent">
+            Posts
+          </button>
+          <button data-view="create" class="nav-btn w-full text-left px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900/60 hover:border-slate-600 border border-transparent">
+            New Post
+          </button>
+          <button data-view="notifications" class="nav-btn w-full text-left px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900/60 hover:border-slate-600 border border-transparent">
+            Notifications
+          </button>
+        </nav>
+
+        <div class="mt-auto pt-4 border-t border-slate-700/70 flex items-center justify-between">
+          <button id="logoutBtn" class="text-xs text-slate-400 hover:text-slate-100">Logout</button>
+          <a href="index.html" class="text-xs text-primary-300 hover:text-primary-100">View site</a>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1 space-y-4 md:space-y-5">
+        <!-- Top bar (mobile) -->
+        <div class="md:hidden flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <div class="h-8 w-8 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold">
+              A
+            </div>
+            <div>
+              <p class="text-sm font-semibold">AWT Admin</p>
+              <p class="text-[11px] text-slate-400">Dashboard</p>
+            </div>
+          </div>
+          <button id="logoutBtnMobile" class="text-xs text-slate-400 hover:text-slate-100 border border-slate-700 rounded-full px-3 py-1">
+            Logout
+          </button>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="glass rounded-3xl p-4 md:p-5 border border-slate-700/70">
+          <h2 class="text-base md:text-lg font-semibold mb-3">Overview</h2>
+          <p class="text-xs text-slate-400 mb-4">Quick stats of your content.</p>
+          <div class="grid gap-3 md:grid-cols-3 text-sm">
+            <div class="rounded-2xl bg-slate-900/70 border border-slate-700 px-3 py-3">
+              <p class="text-[11px] text-slate-400 mb-1">Total posts</p>
+              <p id="statTotalPosts" class="text-lg font-semibold">0</p>
+            </div>
+            <div class="rounded-2xl bg-slate-900/70 border border-slate-700 px-3 py-3">
+              <p class="text-[11px] text-slate-400 mb-1">Published</p>
+              <p id="statPublished" class="text-lg font-semibold">0</p>
+            </div>
+            <div class="rounded-2xl bg-slate-900/70 border border-slate-700 px-3 py-3">
+              <p class="text-[11px] text-slate-400 mb-1">Drafts</p>
+              <p id="statDrafts" class="text-lg font-semibold">0</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- POSTS TABLE VIEW -->
+        <section id="view-posts" class="hidden glass rounded-3xl p-4 md:p-5 border border-slate-700/70">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base md:text-lg font-semibold">Posts</h2>
+            <button data-view="create" class="nav-btn text-xs border border-primary-500 px-3 py-1.5 rounded-full hover:bg-primary-600 hover:text-white">+ New Post</button>
+          </div>
+          <div class="overflow-x-auto text-xs md:text-sm">
+            <table class="w-full border-collapse">
+              <thead>
+              <tr class="text-left text-[11px] text-slate-400 border-b border-slate-700">
+                <th class="py-2 pr-2">Title</th>
+                <th class="py-2 pr-2">Category</th>
+                <th class="py-2 pr-2">Status</th>
+                <th class="py-2 pr-2">Created</th>
+                <th class="py-2 pr-2 text-right">Actions</th>
+              </tr>
+              </thead>
+              <tbody id="postsTableBody"></tbody>
+            </table>
+          </div>
+          <p id="postsEmpty" class="text-xs text-slate-500 mt-3 hidden">No posts yet.</p>
+        </section>
+
+        <!-- CREATE/EDIT POST VIEW -->
+        <section id="view-create" class="hidden glass rounded-3xl p-4 md:p-5 border border-slate-700/70">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 id="formTitle" class="text-base md:text-lg font-semibold">New Post</h2>
+              <p class="text-[11px] text-slate-400">Create or edit an article.</p>
+            </div>
+          </div>
+
+          <form id="postForm" class="space-y-3 text-sm">
+            <input type="hidden" id="postId" />
+
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Title</label>
+              <input id="titleInput" type="text" required class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="Enter article title" />
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs mb-1 text-slate-300">Category</label>
+                <input id="categoryInput" type="text" class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="e.g. Tech, Apps, Tutorials" />
+              </div>
+              <div>
+                <label class="block text-xs mb-1 text-slate-300">Tags (comma separated)</label>
+                <input id="tagsInput" type="text" class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="e.g. tempmail, privacy, guide" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Image URL</label>
+              <input id="imageInput" type="url" class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="https://example.com/image.png" />
+            </div>
+
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Content</label>
+              <textarea id="contentInput" rows="8" required class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="Write your article..."></textarea>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <label class="flex items-center gap-2 text-xs text-slate-300">
+                <input id="draftCheckbox" type="checkbox" class="rounded border-slate-600 bg-slate-900">
+                Save as draft
+              </label>
+              <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span id="draftStatus">Draft auto-save: idle</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button id="savePostBtn" type="submit" class="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-sm font-semibold shadow-neon">
+                Save & Publish
+              </button>
+              <button id="resetFormBtn" type="button" class="px-3 py-2 rounded-xl border border-slate-600 text-xs hover:bg-slate-900/60">
+                Reset
+              </button>
+            </div>
+
+            <p id="statusMessage" class="text-xs text-slate-400 mt-1"></p>
+          </form>
+        </section>
+
+        <!-- NOTIFICATIONS VIEW -->
+        <section id="view-notifications" class="hidden glass rounded-3xl p-4 md:p-5 border border-slate-700/70">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-base md:text-lg font-semibold">Notifications</h2>
+              <p class="text-[11px] text-slate-400">Send popup notifications to visitors.</p>
+            </div>
+          </div>
+
+          <form id="notifForm" class="space-y-3 text-sm">
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Title</label>
+              <input id="notifTitle" type="text" required class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="Notification title" />
+            </div>
+
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Message</label>
+              <textarea id="notifMessage" rows="3" required class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500" placeholder="What do you want to announce?"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs mb-1 text-slate-300">Type</label>
+              <select id="notifType" class="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
+                <option value="info">Info</option>
+                <option value="success">Success</option>
+                <option value="warning">Warning</option>
+              </select>
+            </div>
+
+            <button id="sendNotifBtn" type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold">
+              Send Notification
+            </button>
+            <p id="notifStatus" class="text-xs text-slate-400 mt-1"></p>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ---------- SIMPLE AUTH ----------
+    const ADMIN_PASSWORD = "CHANGE_THIS_PASSWORD"; // change this
+
+    const loginView = document.getElementById('loginView');
+    const appView = document.getElementById('appView');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginMessage = document.getElementById('loginMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutBtnMobile = document.getElementById('logoutBtnMobile');
+
+    function isLoggedIn() {
+      return localStorage.getItem('awt_admin_logged') === 'yes';
+    }
+    function setLoggedIn(val) {
+      if (val) localStorage.setItem('awt_admin_logged', 'yes');
+      else localStorage.removeItem('awt_admin_logged');
+    }
+
+    function showApp() {
+      loginView.classList.add('hidden');
+      appView.classList.remove('hidden');
+    }
+    function showLogin() {
+      appView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+    }
+
+    if (isLoggedIn()) {
+      showApp();
+    }
+
+    loginBtn.addEventListener('click', () => {
+      if (passwordInput.value === ADMIN_PASSWORD) {
+        setLoggedIn(true);
+        showApp();
+        loginMessage.textContent = '';
+        passwordInput.value = '';
+      } else {
+        loginMessage.textContent = 'Incorrect password.';
+      }
+    });
+
+    function logout() {
+      setLoggedIn(false);
+      showLogin();
+    }
+
+    logoutBtn?.addEventListener('click', logout);
+    logoutBtnMobile?.addEventListener('click', logout);
+
+    // ---------- FIREBASE ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRVzGKgsx7BFm2uzEBlMygAotqOI4MAGI",
+      authDomain: "article-c684c.firebaseapp.com",
+      projectId: "article-c684c",
+      storageBucket: "article-c684c.firebasestorage.app",
+      messagingSenderId: "582345070686",
+      appId: "1:582345070686:web:1c4615597777632288bccf"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ---------- NAV VIEW SWITCHING ----------
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const views = {
+      dashboard: document.getElementById('view-dashboard'),
+      posts: document.getElementById('view-posts'),
+      create: document.getElementById('view-create'),
+      notifications: document.getElementById('view-notifications'),
+    };
+
+    function setActiveView(viewName) {
+      Object.entries(views).forEach(([name, el]) => {
+        if (!el) return;
+        if (name === viewName) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      navButtons.forEach(btn => {
+        const v = btn.getAttribute('data-view');
+        if (!v) return;
+        if (v === viewName) {
+          btn.classList.add('bg-slate-900/70', 'border-slate-700', 'text-slate-100');
+          btn.classList.remove('border-transparent', 'text-slate-300');
+        } else {
+          btn.classList.remove('bg-slate-900/70', 'border-slate-700', 'text-slate-100');
+          btn.classList.add('border-transparent', 'text-slate-300');
+        }
+      });
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        setActiveView(view);
+      });
+    });
+
+    // default view
+    setActiveView('dashboard');
+
+    // ---------- POST MANAGEMENT ----------
+    const postsTableBody = document.getElementById('postsTableBody');
+    const postsEmpty = document.getElementById('postsEmpty');
+    const statTotalPosts = document.getElementById('statTotalPosts');
+    const statPublished = document.getElementById('statPublished');
+    const statDrafts = document.getElementById('statDrafts');
+
+    const postForm = document.getElementById('postForm');
+    const postIdInput = document.getElementById('postId');
+    const titleInput = document.getElementById('titleInput');
+    const categoryInput = document.getElementById('categoryInput');
+    const tagsInput = document.getElementById('tagsInput');
+    const imageInput = document.getElementById('imageInput');
+    const contentInput = document.getElementById('contentInput');
+    const draftCheckbox = document.getElementById('draftCheckbox');
+    const draftStatus = document.getElementById('draftStatus');
+    const statusMessage = document.getElementById('statusMessage');
+    const formTitle = document.getElementById('formTitle');
+    const resetFormBtn = document.getElementById('resetFormBtn');
+    const savePostBtn = document.getElementById('savePostBtn');
+
+    let postsCache = [];
+
+    function clearForm() {
+      postIdInput.value = '';
+      titleInput.value = '';
+      categoryInput.value = '';
+      tagsInput.value = '';
+      imageInput.value = '';
+      contentInput.value = '';
+      draftCheckbox.checked = false;
+      formTitle.textContent = 'New Post';
+      statusMessage.textContent = '';
+    }
+
+    resetFormBtn.addEventListener('click', () => {
+      clearForm();
+      localStorage.removeItem('awt_draft');
+    });
+
+    function readDraftFromLocal() {
+      const raw = localStorage.getItem('awt_draft');
+      if (!raw) return;
+      try {
+        const d = JSON.parse(raw);
+        if (d.title) titleInput.value = d.title;
+        if (d.category) categoryInput.value = d.category;
+        if (d.tags) tagsInput.value = d.tags;
+        if (d.imageUrl) imageInput.value = d.imageUrl;
+        if (d.content) contentInput.value = d.content;
+        draftStatus.textContent = 'Draft auto-save: restored';
+      } catch (e) {
+        console.warn('Failed to parse draft', e);
+      }
+    }
+    readDraftFromLocal();
+
+    let draftSaveTimeout;
+    function scheduleDraftSave() {
+      clearTimeout(draftSaveTimeout);
+      draftSaveTimeout = setTimeout(() => {
+        const data = {
+          title: titleInput.value,
+          category: categoryInput.value,
+          tags: tagsInput.value,
+          imageUrl: imageInput.value,
+          content: contentInput.value,
+        };
+        localStorage.setItem('awt_draft', JSON.stringify(data));
+        draftStatus.textContent = 'Draft auto-save: saved';
+      }, 500);
+    }
+
+    [titleInput, categoryInput, tagsInput, imageInput, contentInput].forEach(el => {
+      el.addEventListener('input', scheduleDraftSave);
+    });
+
+    function renderPostsTable() {
+      postsTableBody.innerHTML = '';
+      if (postsCache.length === 0) {
+        postsEmpty.classList.remove('hidden');
+      } else {
+        postsEmpty.classList.add('hidden');
+      }
+
+      let total = postsCache.length;
+      let published = postsCache.filter(p => p.status === 'published').length;
+      let drafts = postsCache.filter(p => p.status === 'draft').length;
+      statTotalPosts.textContent = total;
+      statPublished.textContent = published;
+      statDrafts.textContent = drafts;
+
+      postsCache.forEach(post => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800 text-xs';
+
+        const created = post.createdAt?.toDate ? post.createdAt.toDate() : new Date();
+
+        tr.innerHTML = `
+          <td class="py-2 pr-2 align-top max-w-[180px]">
+            <div class="line-clamp-2">${post.title || 'Untitled'}</div>
+          </td>
+          <td class="py-2 pr-2 align-top">${post.category || '-'}</td>
+          <td class="py-2 pr-2 align-top">
+            <span class="px-2 py-0.5 rounded-full text-[10px] ${
+              post.status === 'published'
+                ? 'bg-emerald-600/30 border border-emerald-500 text-emerald-200'
+                : 'bg-slate-700/50 border border-slate-500 text-slate-200'
+            }">${post.status || 'draft'}</span>
+          </td>
+          <td class="py-2 pr-2 align-top text-[11px] text-slate-400">${created.toLocaleDateString()}</td>
+          <td class="py-2 pr-0 align-top text-right">
+            <button class="text-[11px] text-primary-300 hover:text-primary-100 mr-2 edit-btn">Edit</button>
+            <button class="text-[11px] text-rose-300 hover:text-rose-200 delete-btn">Delete</button>
+          </td>
+        `;
+
+        const editBtn = tr.querySelector('.edit-btn');
+        const deleteBtn = tr.querySelector('.delete-btn');
+
+        editBtn.addEventListener('click', () => {
+          formTitle.textContent = 'Edit Post';
+          setActiveView('create');
+          postIdInput.value = post.id;
+          titleInput.value = post.title || '';
+          categoryInput.value = post.category || '';
+          tagsInput.value = Array.isArray(post.tags) ? post.tags.join(', ') : '';
+          imageInput.value = post.imageUrl || '';
+          contentInput.value = post.content || '';
+          draftCheckbox.checked = post.status === 'draft';
+        });
+
+        deleteBtn.addEventListener('click', async () => {
+          if (!confirm('Delete this post permanently?')) return;
+          try {
+            await db.collection('posts').doc(post.id).delete();
+          } catch (e) {
+            console.error(e);
+            alert('Error deleting post. Check console.');
+          }
+        });
+
+        postsTableBody.appendChild(tr);
+      });
+    }
+
+    db.collection('posts')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((snapshot) => {
+        postsCache = [];
+        snapshot.forEach(doc => postsCache.push({ id: doc.id, ...doc.data() }));
+        renderPostsTable();
+      }, (err) => console.error('posts error', err));
+
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = postIdInput.value.trim();
+      const title = titleInput.value.trim();
+      const category = categoryInput.value.trim();
+      const tagsStr = tagsInput.value.trim();
+      const imageUrl = imageInput.value.trim();
+      const content = contentInput.value.trim();
+      const status = draftCheckbox.checked ? 'draft' : 'published';
+
+      if (!title || !content) {
+        statusMessage.textContent = 'Title and content are required.';
+        return;
+      }
+
+      savePostBtn.disabled = true;
+      statusMessage.textContent = 'Saving...';
+
+      const tags = tagsStr
+        ? tagsStr.split(',').map(t => t.trim()).filter(Boolean)
+        : [];
+
+      const payload = {
+        title,
+        category: category || null,
+        tags,
+        imageUrl: imageUrl || null,
+        content,
+        status,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      try {
+        if (id) {
+          await db.collection('posts').doc(id).update(payload);
+          statusMessage.textContent = 'Post updated.';
+        } else {
+          await db.collection('posts').add({
+            ...payload,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+          statusMessage.textContent = 'Post created.';
+          clearForm();
+          localStorage.removeItem('awt_draft');
+        }
+      } catch (e) {
+        console.error(e);
+        statusMessage.textContent = 'Error saving post.';
+      } finally {
+        savePostBtn.disabled = false;
+      }
+    });
+
+    // ---------- NOTIFICATIONS ----------
+    const notifForm = document.getElementById('notifForm');
+    const notifTitle = document.getElementById('notifTitle');
+    const notifMessage = document.getElementById('notifMessage');
+    const notifType = document.getElementById('notifType');
+    const notifStatus = document.getElementById('notifStatus');
+    const sendNotifBtn = document.getElementById('sendNotifBtn');
+
+    notifForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = notifTitle.value.trim();
+      const message = notifMessage.value.trim();
+      const type = notifType.value;
+
+      if (!title || !message) {
+        notifStatus.textContent = 'Both title and message are required.';
+        return;
+      }
+
+      sendNotifBtn.disabled = true;
+      notifStatus.textContent = 'Sending notification...';
+
+      try {
+        await db.collection('notifications').add({
+          title,
+          message,
+          type,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        notifStatus.textContent = 'Notification sent.';
+        notifTitle.value = '';
+        notifMessage.value = '';
+        notifType.value = 'info';
+      } catch (e) {
+        console.error(e);
+        notifStatus.textContent = 'Error sending notification.';
+      } finally {
+        sendNotifBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
