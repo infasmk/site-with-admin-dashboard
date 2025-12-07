@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonFuture | The Next Gen Tech Blog</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Explore the future of technology with NeonFuture. Curated articles on AI, Cybernetics, and Space.">
+    <meta name="keywords" content="Future, Tech, AI, Cyberpunk, Blog">
+    <meta property="og:title" content="NeonFuture Blog">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://picsum.photos/1200/630">
+
+    <!-- Tailwind & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            purple: '#b026ff',
+                            blue: '#00f3ff',
+                            pink: '#ff00aa',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            /* Futuristic Grid Background */
+            background-color: #0f172a;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        .card-hover:hover {
+            box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="transition-colors duration-500 text-gray-800 dark:text-gray-100 dark:bg-slate-900 bg-gray-50 overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- Background Blobs -->
+    <div class="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-neon-purple/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-neon-blue/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-neon-pink/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 dark:border-white/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 cursor-pointer" onclick="window.location.href='index.html'">
+                    <span class="font-mono text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-purple text-glow">
+                        NEON<span class="text-white dark:text-white text-gray-900">FUTURE</span>
+                    </span>
+                </div>
+                
+                <!-- Search & Theme -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden md:block group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-blue rounded-full blur opacity-50 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Search articles..." 
+                                class="bg-gray-100 dark:bg-black/50 border-none rounded-full py-2 px-4 pl-10 w-64 text-sm focus:ring-2 focus:ring-neon-blue focus:outline-none text-gray-800 dark:text-white transition-all">
+                            <svg class="w-4 h-4 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+
+                    <button id="themeToggle" class="p-2 rounded-full glass-panel hover:bg-white/10 transition-colors relative overflow-hidden group">
+                        <span class="relative z-10">
+                            <!-- Sun -->
+                            <svg id="sunIcon" class="w-6 h-6 text-yellow-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <!-- Moon -->
+                            <svg id="moonIcon" class="w-6 h-6 text-neon-purple hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 24.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full z-10">
+        
+        <!-- Hero Filter Section -->
+        <div class="mb-12 text-center space-y-4">
+            <h1 class="text-4xl md:text-6xl font-bold font-mono tracking-tighter mb-4 text-gray-900 dark:text-white">
+                EXPLORE THE <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-purple">UNKNOWN</span>
+            </h1>
+            
+            <!-- Filters -->
+            <div id="filterContainer" class="flex flex-wrap justify-center gap-3">
+                <button class="filter-pill active px-4 py-1.5 rounded-full text-sm font-medium transition-all bg-neon-blue/20 text-neon-blue border border-neon-blue" data-filter="all">All</button>
+                <!-- Dynamic Cats injected here -->
+            </div>
+        </div>
+
+        <!-- Mobile Search (Visible only on small screens) -->
+        <div class="md:hidden mb-8">
+            <input type="text" id="mobileSearchInput" placeholder="Search..." 
+                class="w-full bg-white/10 backdrop-blur border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-neon-purple focus:outline-none">
+        </div>
+
+        <!-- Grid Layout -->
+        <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Loading Skeleton -->
+            <div class="animate-pulse glass-panel rounded-2xl h-96"></div>
+            <div class="animate-pulse glass-panel rounded-2xl h-96"></div>
+            <div class="animate-pulse glass-panel rounded-2xl h-96"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-16 flex justify-center items-center space-x-4" id="pagination">
+            <!-- Injected by JS -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-white/10 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-500 text-sm">© 2025 NeonFuture. Designed for the bold.</p>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <a href="#" class="text-gray-400 hover:text-neon-blue transition">Twitter</a>
+                <a href="#" class="text-gray-400 hover:text-neon-purple transition">Discord</a>
+                <a href="admin.html" class="text-xs text-gray-600 dark:text-gray-700 hover:text-white">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification Toast Container -->
+    <div id="notificationContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none">
+        <!-- Toasts injected here -->
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore, collection, query, where, orderBy, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRVzGKgsx7BFm2uzEBlMygAotqOI4MAGI",
+            authDomain: "article-c684c.firebaseapp.com",
+            projectId: "article-c684c",
+            storageBucket: "article-c684c.firebasestorage.app",
+            messagingSenderId: "582345070686",
+            appId: "1:582345070686:web:1c4615597777632288bccf",
+            measurementId: "G-93859FWR87"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- STATE & DOM ---
+        let allPosts = [];
+        let filteredPosts = [];
+        let categories = new Set();
+        let currentPage = 1;
+        const postsPerPage = 6;
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        const grid = document.getElementById('postsGrid');
+        const paginationEl = document.getElementById('pagination');
+        const filterContainer = document.getElementById('filterContainer');
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadPosts();
+            initSearch();
+            listenForNotifications();
+        });
+
+        // --- THEME LOGIC ---
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const sun = document.getElementById('sunIcon');
+            const moon = document.getElementById('moonIcon');
+            
+            // Check local storage or system pref
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                sun.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                moon.classList.remove('hidden');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.theme = 'dark';
+                    sun.classList.remove('hidden');
+                    moon.classList.add('hidden');
+                } else {
+                    localStorage.theme = 'light';
+                    sun.classList.add('hidden');
+                    moon.classList.remove('hidden');
+                }
+            });
+        }
+
+        // --- DATA FETCHING ---
+        async function loadPosts() {
+            try {
+                // Using Modular SDK Syntax
+                // FIXED: Removed orderBy('createdAt', 'desc') to avoid needing a composite index in Firestore.
+                // We will sort in JavaScript instead.
+                const q = query(
+                    collection(db, 'posts'),
+                    where('status', '==', 'published')
+                );
+                
+                const snapshot = await getDocs(q);
+
+                allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Client-side Sort (Newest First)
+                allPosts.sort((a, b) => {
+                    const tA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const tB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return tB - tA;
+                });
+
+                // Extract categories
+                allPosts.forEach(post => {
+                    if (post.category) categories.add(post.category);
+                });
+                renderFilters();
+                
+                applyFilters(); // Initial render
+            } catch (error) {
+                console.error("Error loading posts:", error);
+                
+                let errorMsg = "Connection Error. Check your console.";
+                
+                // Check specifically for the permission denied / not enabled error
+                if (error.code === 'permission-denied' || error.message.includes('Cloud Firestore API has not been used')) {
+                    errorMsg = `
+                        <span class="block text-xl font-bold mb-2">DATABASE ACCESS DENIED</span>
+                        <span class="block text-sm">Please ensure you are in <b>Test Mode</b> in the <a href="https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore" target="_blank" class="underline text-white">Firebase Console</a> Security Rules, or update rules to allow public read access.</span>
+                    `;
+                } else if (error.message.includes('requires an index')) {
+                    errorMsg = `
+                        <span class="block text-xl font-bold mb-2">INDEX REQUIRED</span>
+                        <span class="block text-sm">Firestore requires an index for this query. However, the code has been updated to avoid this. If you see this, please refresh.</span>
+                    `;
+                }
+
+                grid.innerHTML = `<p class="text-center text-red-400 w-full col-span-3 border border-red-500/50 p-6 rounded-xl bg-red-900/20">${errorMsg}</p>`;
+            }
+        }
+
+        // --- RENDERING ---
+        function renderFilters() {
+            filterContainer.innerHTML = '<button class="filter-pill active px-4 py-1.5 rounded-full text-sm font-medium transition-all bg-neon-blue/20 text-neon-blue border border-neon-blue" data-filter="all" onclick="window.setFilter(\'all\')">All</button>';
+            const template = (cat) => `
+                <button class="filter-pill px-4 py-1.5 rounded-full text-sm font-medium transition-all border border-gray-600 text-gray-400 hover:border-neon-purple hover:text-neon-purple" 
+                onclick="window.setFilter('${cat}')" data-filter="${cat}">${cat}</button>
+            `;
+            const html = Array.from(categories).map(cat => template(cat)).join('');
+            filterContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Attach to window for HTML onclick events (Module scope is private by default)
+        window.setFilter = (cat) => {
+            currentFilter = cat;
+            currentPage = 1;
+            
+            // Update UI styling
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                if (btn.dataset.filter === cat) {
+                    btn.classList.remove('text-gray-400', 'border-gray-600');
+                    btn.classList.add('bg-neon-blue/20', 'text-neon-blue', 'border-neon-blue');
+                } else {
+                    btn.classList.add('text-gray-400', 'border-gray-600');
+                    btn.classList.remove('bg-neon-blue/20', 'text-neon-blue', 'border-neon-blue');
+                }
+            });
+
+            applyFilters();
+        };
+
+        function initSearch() {
+            const handleSearch = (e) => {
+                searchQuery = e.target.value.toLowerCase();
+                currentPage = 1;
+                applyFilters();
+            };
+
+            // Debounce
+            let timeout;
+            const debouncedSearch = (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => handleSearch(e), 300);
+            };
+
+            document.getElementById('searchInput').addEventListener('input', debouncedSearch);
+            document.getElementById('mobileSearchInput').addEventListener('input', debouncedSearch);
+        }
+
+        function applyFilters() {
+            filteredPosts = allPosts.filter(post => {
+                const matchesCat = currentFilter === 'all' || post.category === currentFilter;
+                const matchesSearch = post.title.toLowerCase().includes(searchQuery) || 
+                                      post.content.toLowerCase().includes(searchQuery) ||
+                                      (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery)));
+                return matchesCat && matchesSearch;
+            });
+            renderGrid();
+        }
+
+        function renderGrid() {
+            grid.innerHTML = '';
+            
+            if (filteredPosts.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-20 text-gray-500">No articles found in this timeline.</div>`;
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            // Pagination Logic
+            const start = (currentPage - 1) * postsPerPage;
+            const end = start + postsPerPage;
+            const postsToShow = filteredPosts.slice(start, end);
+
+            postsToShow.forEach((post, index) => {
+                const date = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown Date';
+                const card = document.createElement('article');
+                card.className = 'glass-panel dark:bg-white/5 bg-white rounded-2xl overflow-hidden card-hover transition-all duration-300 flex flex-col h-full animate-slide-up';
+                card.style.animationDelay = `${index * 100}ms`;
+                card.onclick = () => window.location.href = `article.html?id=${post.id}`;
+                card.style.cursor = 'pointer';
+
+                const tagsHtml = (post.tags || []).slice(0, 2).map(t => `<span class="text-xs font-mono text-neon-pink mr-2">#${t}</span>`).join('');
+
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden relative group">
+                        <img src="${post.imageUrl || 'https://picsum.photos/400/300'}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${post.title}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <span class="absolute bottom-3 left-3 bg-neon-purple/20 backdrop-blur border border-neon-purple text-white text-xs px-2 py-1 rounded uppercase tracking-wider font-bold">
+                            ${post.category || 'General'}
+                        </span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="mb-2 flex justify-between items-center text-xs text-gray-400 dark:text-gray-500 font-mono">
+                            <span>${date}</span>
+                            <div>${tagsHtml}</div>
+                        </div>
+                        <h2 class="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-neon-blue transition-colors leading-tight">
+                            ${post.title}
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">
+                            ${post.content.replace(/<[^>]*>?/gm, '').substring(0, 100)}...
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-white/10 flex items-center text-neon-blue text-sm font-bold group">
+                            READ ARTICLE 
+                            <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+            let html = '';
+            
+            if (totalPages > 1) {
+                // Prev
+                html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="window.changePage(${currentPage - 1})" class="px-4 py-2 glass-panel rounded-lg hover:bg-white/10 disabled:opacity-50 transition text-gray-700 dark:text-white">Previous</button>`;
+                
+                // Numbers
+                for (let i = 1; i <= totalPages; i++) {
+                     const activeClass = i === currentPage ? 'bg-neon-blue text-black font-bold' : 'hover:bg-white/10 text-gray-700 dark:text-white';
+                     html += `<button onclick="window.changePage(${i})" class="w-10 h-10 rounded-lg glass-panel ${activeClass} transition">${i}</button>`;
+                }
+
+                // Next
+                html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changePage(${currentPage + 1})" class="px-4 py-2 glass-panel rounded-lg hover:bg-white/10 disabled:opacity-50 transition text-gray-700 dark:text-white">Next</button>`;
+            }
+            paginationEl.innerHTML = html;
+        }
+
+        window.changePage = (page) => {
+            currentPage = page;
+            renderGrid();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- NOTIFICATIONS SYSTEM ---
+        function listenForNotifications() {
+            // Using Modular SDK Syntax
+            const q = query(
+                collection(db, 'notifications'),
+                orderBy('createdAt', 'desc'),
+                limit(1)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                  snapshot.docChanges().forEach((change) => {
+                      if (change.type === "added") {
+                          const data = change.doc.data();
+                          // Filter out old notifications (e.g., those older than page load time)
+                          // For simplicity, we check if the timestamp is very recent (within 10 seconds of now)
+                          const now = new Date().getTime();
+                          const notifTime = data.createdAt ? data.createdAt.toMillis() : now;
+                          
+                          // If notification is younger than 30 seconds (accounting for some latency)
+                          if (now - notifTime < 30000) {
+                              showToast(data);
+                          }
+                      }
+                  });
+              }, (error) => {
+                  if (error.code === 'permission-denied') {
+                      console.warn("Notifications disabled: Firebase Security Rules block access.");
+                  } else {
+                      console.error("Notification listener error:", error);
+                  }
+              });
+        }
+
+        function showToast(data) {
+            const container = document.getElementById('notificationContainer');
+            
+            // Colors based on type
+            let borderColor = 'border-neon-blue';
+            let icon = '<svg class="w-6 h-6 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            
+            if (data.type === 'success') {
+                borderColor = 'border-green-400';
+                icon = '<svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            } else if (data.type === 'warning') {
+                borderColor = 'border-neon-pink';
+                icon = '<svg class="w-6 h-6 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto w-80 p-4 rounded-xl glass-panel bg-black/80 backdrop-blur border-l-4 ${borderColor} shadow-[0_0_15px_rgba(0,0,0,0.5)] transform translate-y-full opacity-0 transition-all duration-500 ease-out flex items-start gap-3`;
+            
+            toast.innerHTML = `
+                <div class="flex-shrink-0 pt-0.5">${icon}</div>
+                <div class="flex-1">
+                    <h4 class="text-white font-bold text-sm font-mono">${data.title}</h4>
+                    <p class="text-gray-300 text-xs mt-1 leading-relaxed">${data.message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-full', 'opacity-0');
+            });
+
+            // Auto Dismiss
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
